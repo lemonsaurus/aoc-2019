@@ -1,10 +1,11 @@
 import string
+from typing import Union
 
 ALLOWED_CHARS = string.ascii_lowercase + string.ascii_uppercase
 MAXCHAR_LIMIT = len(ALLOWED_CHARS)
 
 
-def load_input(input_file="data/input.txt", raw=False):
+def load_input(input_file: str = "data/input.txt", raw: bool = False) -> Union[list, str]:
     """Load the input data into memory."""
     with open(input_file, "r") as readfile:
 
@@ -14,7 +15,7 @@ def load_input(input_file="data/input.txt", raw=False):
             return readfile.read()
 
 
-def _increment_symbol(letter):
+def _increment_symbol(letter: str) -> str:
     """
     This helper function increments a symbol.
     increment_symbol('a') -> 'b'
@@ -26,7 +27,7 @@ def _increment_symbol(letter):
     ]
 
 
-def next_short_string(prev_string=None):
+def next_short_string(prev_string: str = None) -> str:
     """
     This function generates a short string
     and returns it to the user.

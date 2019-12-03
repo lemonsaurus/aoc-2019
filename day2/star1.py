@@ -9,7 +9,10 @@ intcode_program = load_input(raw=True)
 class Opcode(enum.Enum):
     ADD = 1
     MULTIPLY = 2
-    STOP = 99
+    HALT = 99
+
+    def __eq__(self, other):
+        return self.value == other
 
 
 def parse_intcode(program: str) -> List[int]:
@@ -28,12 +31,12 @@ def to_intcode(serialized_intcode: List[int]) -> str:
     return ",".join([str(num) for num in serialized_intcode])
 
 
-def get_first_intcode(program: str) -> int:
-    """Get the first intcode in a program.
+def get_first_address(memory: str) -> int:
+    """Get the first address in some intcode memory.
 
     "100,2,3,4" -> 100
     """
-    return int(program.split(",", 1)[0])
+    return int(memory.split(",", 1)[0])
 
 
 def run_intcode_program(program: str) -> str:
@@ -48,12 +51,14 @@ def run_intcode_program(program: str) -> str:
         opcode = instructions[index]
 
         # If we encounter opcode 99, we're done.
-        if opcode == Opcode.STOP:
+        if opcode == Opcode.HALT:
             break
 
         # Initialize values
-        first_value = instructions[index + 1]
-        second_value = instructions[index + 2]
+        first_index = instructions[index + 1]
+        first_value = instructions[first_index]
+        second_index = instructions[index + 2]
+        second_value = instructions[second_index]
         target_index = instructions[index + 3]
 
         # Addition
@@ -75,5 +80,5 @@ intcode_program = to_intcode(parsed)
 
 # Now run it through the computer
 completed_program = run_intcode_program(intcode_program)
-value = get_first_intcode(completed_program)
-print(value)
+value = get_first_address(completed_program)
+print(completed_program)

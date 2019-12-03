@@ -26,4 +26,3 @@ for noun in range(100):
             print("-- Target hit! --")
             print(f"The answer is {100 * noun + verb}")
             exit()
-

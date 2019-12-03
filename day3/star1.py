@@ -28,11 +28,7 @@ def calculate_destination(origin: Tuple[int, int], instruction: str) -> Tuple[in
 
 
 def get_wire_intersections(*wires: List[List[str]]) -> Set[Tuple[int, int]]:
-    """
-    Calculate the manhattan distance to the closest intersection between
-    the two wires described by the provided wiring diagrams.
-    """
-
+    """Find all the intersections between the provided wiring diagrams."""
     wire_coords = []
     for wiring_diagram in wires:
 

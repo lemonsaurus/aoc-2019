@@ -9,7 +9,6 @@ def is_valid(password: int) -> bool:
     - The two adjacent repeating digits should not be part of a larger group.
     """
     password = str(password)
-    has_double = False
 
     for digit in range(1, 6):
         # Check if the password has descending digits
@@ -29,9 +28,9 @@ def is_valid(password: int) -> bool:
 
             # Otherwise, we got an isolated double.
             else:
-                has_double = True
+                return True
 
-    return has_double
+    return False
 
 
 # Calculate total number of valid passwords in the range

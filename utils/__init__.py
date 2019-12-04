@@ -83,3 +83,11 @@ def next_short_string(prev_string: str = None) -> str:
     # put it back together
     new_string = ''.join(new_string)
     return new_string
+
+
+def get_manhattan_distance(a, b):
+    """
+    Finds the manhattan distance between
+    point a and point b
+    """
+    return abs(a[0] - b[0]) + abs(a[1] - b[1])

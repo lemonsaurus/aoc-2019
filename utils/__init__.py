@@ -5,7 +5,7 @@ ALLOWED_CHARS = string.ascii_lowercase + string.ascii_uppercase
 MAXCHAR_LIMIT = len(ALLOWED_CHARS)
 
 
-def load_input(input_file: str = "data/input.txt", raw: bool = False) -> Union[list, str]:
+def load_input(input_file: str = "input.txt", raw: bool = False) -> Union[list, str]:
     """Load the input data into memory."""
     with open(input_file, "r") as readfile:
 

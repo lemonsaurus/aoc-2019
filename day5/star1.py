@@ -1,3 +1,8 @@
+from day5.models import IntcodeComputer
 from utils import load_input
 
-_ = load_input(raw=True).split(",")
+intcode_program = load_input(raw=True)
+
+computer = IntcodeComputer(intcode_program)
+computer.run()
+

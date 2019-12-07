@@ -81,4 +81,4 @@ intcode_program = to_intcode(parsed)
 # Now run it through the computer
 completed_program = run_intcode_program(intcode_program)
 value = get_first_address(completed_program)
-print(completed_program)
+print(value)

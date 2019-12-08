@@ -1,22 +1,9 @@
-from day6.models import CelestialBody
+from day6.models import CelestialMapper
 from utils import load_input
 
 orbital_chart = load_input()
-celestial_objects = {}
+mapper = CelestialMapper(orbital_chart)
+mapper.map_celestial_objects()
+total_orbits = mapper.celestial_map['COM'].get_all_child_orbits()
 
-for orbit in orbital_chart:
-    parent, child = orbit.split(")")
-
-    # Check if we need to create the objects
-    if parent not in celestial_objects:
-        parent_body = CelestialBody(name=parent)
-        celestial_objects[parent] = parent_body
-
-    if child not in celestial_objects:
-        child_body = CelestialBody(name=child, parent=celestial_objects[parent])
-        celestial_objects[child] = child_body
-
-    # Create the relationship
-    celestial_objects[parent].add_child(celestial_objects[child])
-
-print(celestial_objects["COM"].get_all_child_orbits())
+print(total_orbits)

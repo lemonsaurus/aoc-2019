@@ -1,6 +1,6 @@
 from utils import load_input
 
-from day5.models import IntcodeComputer
+from models import IntcodeComputer
 
 intcode_program = load_input(raw=True)
 

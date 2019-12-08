@@ -1,3 +1,4 @@
+import collections
 import enum
 from typing import List, Tuple, Union, Optional
 
@@ -28,9 +29,17 @@ class ParameterMode(enum.Enum):
 class IntcodeComputer:
     """Runs IntCode programs."""
 
-    def __init__(self, program: str, start_state: Optional[Tuple[int, int]] = None):
+    def __init__(
+        self,
+        program: str,
+        start_state: Optional[Tuple[int, int]] = None,
+        input_values: Optional[List[int]] = None
+    ):
         self.pointer = 0
         self.memory = self._parse_program(program)
+        self.input_values = collections.deque(input_values)
+        self.output_values = []
+        self.halted = False
 
         # Restore the computer to a previous_state
         if start_state:
@@ -94,12 +103,13 @@ class IntcodeComputer:
             self.first_param = self._get_value(self.memory[self.pointer + 1], first_mode)
             self.second_param = self._get_value(self.memory[self.pointer + 2], second_mode)
 
-    def run(self):
+    def run(self, pause_after_output: bool = False, silence_output: bool = True):
         """Run the IntCode program until we hit a HALT opcode."""
-        while True:
+        while not self.halted:
             self._parse_instruction()
 
             if self.opcode == Opcode.HALT:
+                self.halted = True
                 break
 
             elif self.opcode == Opcode.ADD:
@@ -111,13 +121,21 @@ class IntcodeComputer:
                 self.pointer += 4
 
             elif self.opcode == Opcode.INPUT:
-                input_value = input("Please input an intcode: ")
+                if self.input_values:
+                    input_value = self.input_values.pop()
+                else:
+                    input_value = input("Please input an intcode: ")
                 self.memory[self.target_index] = int(input_value)
                 self.pointer += 2
 
             elif self.opcode == Opcode.OUTPUT:
-                print(self.memory[self.target_index])
+                output = self.memory[self.target_index]
+                if not silence_output:
+                    print(output)
+                self.output_values.append(output)
                 self.pointer += 2
+                if pause_after_output:
+                    break
 
             elif self.opcode == Opcode.JUMP_IF_TRUE:
                 if self.first_param != 0:
@@ -144,9 +162,3 @@ class IntcodeComputer:
                 else:
                     self.memory[self.target_index] = 0
                 self.pointer += 4
-
-
-
-
-
-

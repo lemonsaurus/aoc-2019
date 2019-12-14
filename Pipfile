@@ -5,6 +5,7 @@ name = "pypi"
 
 [packages]
 bresenham = "*"
+more_itertools = "*"
 
 [requires]
 python_version = "3.7"

@@ -2,6 +2,8 @@ import collections
 import enum
 from typing import List, Tuple, Union, Optional
 
+from models import AutoResizingList
+
 
 class Opcode(enum.Enum):
     ADD = 1
@@ -12,6 +14,7 @@ class Opcode(enum.Enum):
     JUMP_IF_FALSE = 6
     LESS_THAN = 7
     EQUALS = 8
+    RELATIVE_BASE_OFFSET = 9
     HALT = 99
 
     def __eq__(self, other):
@@ -21,6 +24,7 @@ class Opcode(enum.Enum):
 class ParameterMode(enum.Enum):
     POSITION_MODE = 0
     IMMEDIATE_MODE = 1
+    RELATIVE_MODE = 2
 
     def __eq__(self, other):
         return self.value == other
@@ -36,8 +40,12 @@ class IntcodeComputer:
         input_values: Optional[List[int]] = None
     ):
         self.pointer = 0
-        self.memory = self._parse_program(program)
-        self.input_values = collections.deque(input_values)
+        self.relative_base = 0
+        self.memory = AutoResizingList(self._parse_program(program))
+
+        if input_values:
+            self.input_values = collections.deque(input_values)
+
         self.output_values = []
         self.halted = False
 
@@ -66,6 +74,17 @@ class IntcodeComputer:
             return self.memory[value]
         elif parameter_mode == ParameterMode.IMMEDIATE_MODE:
             return value
+        elif parameter_mode == ParameterMode.RELATIVE_MODE:
+            return self.memory[value + self.relative_base]
+
+    def _get_index(self, value: int, parameter_mode: Union[int, ParameterMode]) -> int:
+        """Get the target index for a parameter."""
+        if parameter_mode == ParameterMode.POSITION_MODE:
+            return self.memory[value]
+        elif parameter_mode == ParameterMode.IMMEDIATE_MODE:
+            return value
+        elif parameter_mode == ParameterMode.RELATIVE_MODE:
+            return self.memory[value] + self.relative_base
 
     def get_first_address(self) -> int:
         """Get the first address in intcode memory.
@@ -85,23 +104,23 @@ class IntcodeComputer:
         # Set the modes
         first_mode = int(opstring[-3])
         second_mode = int(opstring[-4])
-        # third_mode = int(opstring[-5])
+        third_mode = int(opstring[-5])
 
         # Set the params
         if self.opcode in (Opcode.ADD, Opcode.MULTIPLY, Opcode.LESS_THAN, Opcode.EQUALS):
             self.first_param = self._get_value(self.memory[self.pointer + 1], first_mode)
             self.second_param = self._get_value(self.memory[self.pointer + 2], second_mode)
-            self.target_index = self.memory[self.pointer + 3]
+            self.target_index = self._get_index(self.pointer + 3, third_mode)
 
         elif self.opcode == Opcode.INPUT or self.opcode == Opcode.OUTPUT:
-            if first_mode == ParameterMode.POSITION_MODE:
-                self.target_index = self.memory[self.pointer + 1]
-            elif first_mode == ParameterMode.IMMEDIATE_MODE:
-                self.target_index = self.pointer + 1
+            self.target_index = self._get_index(self.pointer + 1, first_mode)
 
         elif self.opcode == Opcode.JUMP_IF_FALSE or self.opcode == Opcode.JUMP_IF_TRUE:
             self.first_param = self._get_value(self.memory[self.pointer + 1], first_mode)
             self.second_param = self._get_value(self.memory[self.pointer + 2], second_mode)
+
+        elif self.opcode == Opcode.RELATIVE_BASE_OFFSET:
+            self.first_param = self._get_value(self.memory[self.pointer + 1], first_mode)
 
     def run(self, pause_after_output: bool = False, silence_output: bool = True):
         """Run the IntCode program until we hit a HALT opcode."""
@@ -162,3 +181,7 @@ class IntcodeComputer:
                 else:
                     self.memory[self.target_index] = 0
                 self.pointer += 4
+
+            elif self.opcode == Opcode.RELATIVE_BASE_OFFSET:
+                self.relative_base += self.first_param
+                self.pointer += 2

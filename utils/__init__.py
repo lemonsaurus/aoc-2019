@@ -76,7 +76,7 @@ def next_short_string(prev_string: str = None) -> str:
             if num == 0 and new_string[num] == 'a':
                 new_string.append('a')
 
-        # if the previous symbol didn't turn into 'a', we don't need to keep going.
+        # if Daythe previous symbol didn't turn into 'a', we don't need to keep going.
         else:
             break
 
